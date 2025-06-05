@@ -1,29 +1,25 @@
-InstagramInfluencerAnalysis
-Welcome to InstagramInfluencerAnalysis! This repository contains a Jupyter Notebook that dives into a dataset of Instagram influencers, performing data cleaning, exploratory data analysis (EDA), and creating insightful visualizations like bar plots and word clouds. It also includes an interactive dashboard to explore trends in subscribers, engagement metrics, and categories. Perfect for data enthusiasts and social media analysts!
-About the Project
-This project analyzes a dataset of Instagram influencers (as of September 2022) to uncover patterns in audience engagement, subscriber counts, and content categories. The notebook handles missing values, standardizes formats, removes duplicates, and generates features like engagement rates and subscriber tiers. Visualizations include top influencers by engagement and category distributions, with an interactive dashboard for dynamic exploration.
-Dataset
+INSTAGRAM INFLUENCER ANALYSIS
+Welcome to InstagramInfluencerAnalysis! This repository hosts a Jupyter Notebook that dives into a dataset of Instagram influencers, offering data cleaning, exploratory data analysis (EDA), and vibrant visualizations to uncover trends in social media influence.
+PROJECT OVERVIEW
+This project analyzes a dataset of Instagram influencers from September 2022. It includes:
 
-social media influencers - instagran sep-2822.csv: Contains influencer data with columns:
-S.no: Index
-Instagram name: Influencer's Instagram handle
-Name: Influencer's name
-Subscribers: Follower count (in K, M, or B)
-Audience country: Primary audience location
-Authentic engagement: Genuine engagement metrics
-Engagement average: Average engagement per post
-Category_1 and Category_2: Content categories
+Data Cleaning: Handles missing values, standardizes formats, and removes duplicates.
+Exploratory Data Analysis (EDA): Summarizes subscriber counts, engagement metrics, and category trends.
+Visualizations: Features bar plots, word clouds, and an interactive dashboard built with Plotly to explore top influencers by engagement and audience country.
+Feature Engineering: Adds columns like Subscriber Tier, High Engagement, and Primary Category for deeper insights.
 
-Note: Ensure the CSV file is in the same directory as the notebook for the code to run.
-Interactive Dashboard
-The project includes an interactive dashboard built with Plotly, allowing you to:
+DATASET
+The dataset, social media influencers - instagran sep-2822.csv, includes:
 
-Filter top influencers by country and category.
-Visualize engagement averages and subscriber tiers.
-Explore category distributions via bar plots and word clouds.To use the dashboard, run the notebook in a Jupyter environment or Google Colab and interact with the Plotly visualizations.
+Columns: Instagram name, Name, Subscribers, Audience country, Authentic engagement, Engagement average, Category_1, Category_2.
+Size: ~1,050 entries (cleaned to ~983 after removing duplicates).
 
-Add the Dataset: Place the social media influencers - instagran sep-2822.csv file in the repository's root directory.
-Run the Notebook: Open InstagramInfluencerAnalysis.ipynb in Jupyter Notebook, JupyterLab, or Google Colab.
-Explore the Dashboard: Interact with the Plotly visualizations to filter and explore the data dynamically.
+Note: Upload the CSV file to the repository root for the notebook to run smoothly.
+INTERACTIVE DASHBOARD
+The notebook includes a Plotly-based interactive dashboard (see notebook cells on Pages 11–12) that:
 
-Happy analyzing, and enjoy uncovering social media insights! 
+Displays top 10 influencers by engagement average per audience country.
+Allows toggling between countries using dropdown menus.
+Visualizes engagement metrics with color-coded categories for easy comparison.
+
+
