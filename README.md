@@ -1,4 +1,4 @@
-INSTAGRAM INFLUENCER ANALYSIS
+##INSTAGRAM INFLUENCER ANALYSIS
 Welcome to InstagramInfluencerAnalysis! This repository hosts a Jupyter Notebook that dives into a dataset of Instagram influencers, offering data cleaning, exploratory data analysis (EDA), and vibrant visualizations to uncover trends in social media influence.
 PROJECT OVERVIEW
 This project analyzes a dataset of Instagram influencers from September 2022. It includes:
