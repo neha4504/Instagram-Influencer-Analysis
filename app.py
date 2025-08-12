@@ -1,67 +1,61 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
-# Set page layout
-st.set_page_config(page_title="Instagram Influencer Dashboard", layout="wide")
-
-# Load dataset
-df = pd.read_csv("social media influencers - instagram sep-2022.csv")  # Replace with your actual CSV file name
-
-# Clean column names
-df.columns = df.columns.str.strip()
-
-# Rename for consistency (optional but helps avoid editing all code)
-df.rename(columns={"Subscribers": "Followers"}, inplace=True)
+from plotly.subplots import make_subplots
 
 # Title
-st.title(" Instagram Influencer Dashboard")
+st.set_page_config(layout="wide")
+st.title("Instagram Influencer Analytics Dashboard")
 
-# Sidebar filters
-st.sidebar.header("Filter Influencers")
+# File uploader
+uploaded_file = st.file_uploader("Upload the influencer CSV file", type=["csv"])
+if uploaded_file is not None:
+    df = pd.read_csv("social media influencers - instagram sep-2022.csv")
 
-min_followers = int(df["Subscribers"].min())
-max_followers = int(df["Subscribers"].max())
+    # Top 7 categories
+    top_7_categories = df['Category_1'].value_counts().nlargest(7).reset_index()
+    top_7_categories.columns = ['Category', 'Count']
 
-followers_range = st.sidebar.slider("Select Follower Range:", min_followers, max_followers, (min_followers, max_followers))
+    categories = df['Category_1'].dropna().unique()
+    countries = df['Audience country'].dropna().unique()
 
-filtered_df = df[(df["Subscribers"] >= followers_range[0]) & (df["Subscribers"] <= followers_range[1])]
+    # Sidebar filters
+    selected_category = st.sidebar.selectbox("Filter by Category", ["All"] + list(categories))
+    selected_country = st.sidebar.selectbox("Filter by Country", ["All"] + list(countries))
 
+    # Filter dataset
+    filtered_df = df.copy()
+    if selected_category != "All":
+        filtered_df = filtered_df[filtered_df['Category_1'] == selected_category]
+    if selected_country != "All":
+        filtered_df = filtered_df[filtered_df['Audience country'] == selected_country]
 
-# KPI section
-st.subheader("Key Metrics")
+    # Bar chart: Top 10 influencers by engagement
+    top_engagement = filtered_df.nlargest(10, 'Engagement average')
+    bar_fig = px.bar(
+        top_engagement,
+        x='Engagement average',
+        y='Instagram name',
+        color='Category_1',
+        orientation='h',
+        text='Engagement average',
+        title="Top 10 Influencers by Engagement"
+    )
+    bar_fig.update_layout(yaxis={'categoryorder':'total ascending'})
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Influencers", len(filtered_df))
-col2.metric("Average Engagement", f"{filtered_df['Engagement average'].mean():.2f}")
-col3.metric("Avg Authentic Engagement", f"{filtered_df['Authentic engagement'].mean():.2f}")
+    # Pie chart: Category distribution
+    pie_data = filtered_df['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
+    pie_fig = px.pie(
+        names=pie_data.index,
+        values=pie_data.values,
+        title="Category Distribution",
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
 
-# Charts
-st.subheader(" Engagement vs Followers")
+    # Layout: 2 charts side by side
+    col1, col2 = st.columns(2)
+    col1.plotly_chart(bar_fig, use_container_width=True)
+    col2.plotly_chart(pie_fig, use_container_width=True)
 
-fig1 = px.scatter(
-    filtered_df,
-    x="Followers",
-    y="Engagement average",
-    size="Authentic engagement",
-    color="Category_1",
-    hover_data=["Instagram name", "Name"]
-)
-st.plotly_chart(fig1, use_container_width=True)
-
-st.subheader("Audience Country Distribution")
-
-fig2 = px.histogram(
-    filtered_df,
-    x="Audience country",
-    color="Category_1",
-    barmode="group"
-)
-st.plotly_chart(fig2, use_container_width=True)
-
-# Show filtered data
-st.subheader("Filtered Influencer Data")
-st.dataframe(filtered_df)
-
-
-
+else:
+    st.warning("Please upload a CSV file to continue.")
