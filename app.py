@@ -1,16 +1,21 @@
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
+import streamlit as st
 
-# Load dataset
-df = pd.read_csv("transformed_instagram_influencers.csv")  # Ensure this file is in the same directory
+try:
+    df = pd.read_csv("Processed-dataset/transformed_instagram_influencers.csv")
+    df.columns = df.columns.str.strip()
+except FileNotFoundError:
+    st.error("CSV file not found. Please ensure the path is correct and the file exists.")
+    st.stop()
 
-# Prepare top 7 categories
+# Prepare top_7_categories
 top_7_categories = df['Category_1'].value_counts().nlargest(7).reset_index()
 top_7_categories.columns = ['Category', 'Count']
 
 # Initialize subplot
-fig = make_subplots(rows=1, cols=2,
+fig = make_subplots(rows=1, cols=2, 
                     subplot_titles=("Top 10 Influencers by Engagement", "Category Distribution"),
                     specs=[[{"type": "bar"}, {"type": "pie"}]])
 
@@ -18,7 +23,7 @@ fig = make_subplots(rows=1, cols=2,
 categories = df['Category_1'].unique()
 countries = df['Audience country'].dropna().unique()
 
-# Track indices
+# Track which categories and countries have traces
 category_bar_indices = {}
 category_pie_indices = {}
 country_bar_indices = {}
@@ -26,7 +31,7 @@ country_pie_indices = {}
 
 # Add bar traces for each category
 bar_traces = []
-for cat in categories:
+for idx, cat in enumerate(categories):
     filtered_df = df[df['Category_1'] == cat].nlargest(10, 'Engagement average')
     if not filtered_df.empty:
         bar = px.bar(filtered_df, x='Engagement average', y='Instagram name', color='Category_1',
@@ -38,7 +43,7 @@ for cat in categories:
         fig.add_trace(trace, row=1, col=1)
 
 # Add bar traces for each country
-for country in countries:
+for idx, country in enumerate(countries):
     filtered_df = df[df['Audience country'] == country].nlargest(10, 'Engagement average')
     if not filtered_df.empty:
         bar = px.bar(filtered_df, x='Engagement average', y='Instagram name', color='Category_1',
@@ -60,7 +65,7 @@ fig.add_trace(default_bar_trace, row=1, col=1)
 
 # Add pie traces for each category
 pie_traces = []
-for cat in categories:
+for idx, cat in enumerate(categories):
     filtered_counts = df[df['Category_1'] == cat]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
     if filtered_counts.sum() > 0:
         pie = px.pie(names=top_7_categories['Category'], values=filtered_counts,
@@ -72,7 +77,7 @@ for cat in categories:
         fig.add_trace(trace, row=1, col=2)
 
 # Add pie traces for each country
-for country in countries:
+for idx, country in enumerate(countries):
     filtered_counts = df[df['Audience country'] == country]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
     if filtered_counts.sum() > 0:
         pie = px.pie(names=top_7_categories['Category'], values=filtered_counts,
@@ -92,11 +97,11 @@ default_pie_index = len(pie_traces)
 pie_traces.append(default_pie_trace)
 fig.add_trace(default_pie_trace, row=1, col=2)
 
-# Dropdowns
+# Create dropdown menus
 category_buttons = [
     dict(label="All Categories", method="update", args=[{
-        "visible": [i == default_bar_index for i in range(len(bar_traces))] +
-                   [i == default_pie_index for i in range(len(pie_traces))]
+        "visible": [True if i == default_bar_index else False for i in range(len(bar_traces))] +
+                   [True if i == default_pie_index else False for i in range(len(pie_traces))]
     }])
 ]
 for cat in categories:
@@ -111,8 +116,8 @@ for cat in categories:
 
 country_buttons = [
     dict(label="All Countries", method="update", args=[{
-        "visible": [i == default_bar_index for i in range(len(bar_traces))] +
-                   [i == default_pie_index for i in range(len(pie_traces))]
+        "visible": [True if i == default_bar_index else False for i in range(len(bar_traces))] +
+                   [True if i == default_pie_index else False for i in range(len(pie_traces))]
     }])
 ]
 for country in countries:
@@ -125,32 +130,28 @@ for country in countries:
             dict(label=country, method="update", args=[{"visible": visible + pie_visible}])
         )
 
-# Final layout
+# Update layout
 fig.update_layout(
     title_text="Instagram Influencer Analytics Dashboard",
     title_x=0.5,
     showlegend=True,
     height=600,
     width=1200,
-    template='plotly_dark',
-    paper_bgcolor='black',
-    plot_bgcolor='black',
-    font=dict(family="Arial", size=12, color='white'),
+    template='plotly_white',
     updatemenus=[
         dict(buttons=category_buttons,
              direction="down", showactive=True, x=0.1, y=1.2, xanchor="left", yanchor="top",
-             font=dict(size=12, color='white'), bgcolor='rgba(50,50,50,0.9)'),
+             font=dict(size=12), bgcolor='rgba(255,255,255,0.8)'),
         dict(buttons=country_buttons,
              direction="down", showactive=True, x=0.5, y=1.2, xanchor="left", yanchor="top",
-             font=dict(size=12, color='white'), bgcolor='rgba(50,50,50,0.9)')
+             font=dict(size=12), bgcolor='rgba(255,255,255,0.8)')
     ],
+    font=dict(family="Arial", size=12),
     margin=dict(t=150)
 )
 
+# Update axes
 fig.update_xaxes(title_text="Engagement (Millions)", row=1, col=1, tickformat=".2s")
 fig.update_yaxes(title_text="Influencer", row=1, col=1)
 
-# Save to HTML and show
-fig.write_html('influencer_dashboard.html')
-fig.show()
-
+st.plotly_chart(fig, use_container_width=True)
