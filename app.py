@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(page_title="Instagram Influencer Analytics", layout="wide")
 
 # Load dataset
-df = pd.read_csv("C:\\Users\\DELL\\Downloads\\social media influencers - instagram sep-2022.csv")
+df = pd.read_csv("social media influencers - instagram sep-2022.csv")
 
 # Clean 'Engagement average' column
 df['Engagement average'] = (
@@ -68,3 +68,4 @@ avg_engagement = round(filtered_df['Engagement average'].mean(), 2)
 col3, col4 = st.columns(2)
 col3.metric("Influencers in Segment", total_influencers)
 col4.metric("Avg Engagement Rate", f"{avg_engagement}")
+
