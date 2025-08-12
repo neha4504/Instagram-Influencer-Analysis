@@ -1,46 +1,45 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from plotly.subplots import make_subplots
 
-# Set page config
+# Page config
 st.set_page_config(page_title="Instagram Influencer Analytics", layout="wide")
 
-# Load CSV directly from the repo (adjust path as per your folder structure)
+# Load CSV directly
 df = pd.read_csv("social media influencers - instagram sep-2022.csv")
 
-# Clean column names (remove leading/trailing whitespace)
+# Clean column names
 df.columns = df.columns.str.strip()
+
+# Convert 'Engagement average' to numeric
+df['Engagement average'] = df['Engagement average'].astype(str).str.replace(',', '').astype(float)
 
 # Title
 st.title("📊 Instagram Influencer Analytics Dashboard")
 
-# Optional data preview
+# Optional preview
 st.subheader("Dataset Preview")
 st.dataframe(df.head())
-import plotly.express as px
-from plotly.subplots import make_subplots
-import pandas as pd
 
-# Prepare top_7_categories
+# Prepare top 7 categories
 top_7_categories = df['Category_1'].value_counts().nlargest(7).reset_index()
 top_7_categories.columns = ['Category', 'Count']
 
-# Initialize subplot
+# Create subplot
 fig = make_subplots(rows=1, cols=2, 
                     subplot_titles=("Top 10 Influencers by Engagement", "Category Distribution"),
                     specs=[[{"type": "bar"}, {"type": "pie"}]])
 
-# Get unique categories and countries
 categories = df['Category_1'].unique()
 countries = df['Audience country'].dropna().unique()
 
-# Track which categories and countries have traces
 category_bar_indices = {}
 category_pie_indices = {}
 country_bar_indices = {}
 country_pie_indices = {}
 
-# Add bar traces for each category
+# Bar chart traces (category-wise)
 bar_traces = []
 for idx, cat in enumerate(categories):
     filtered_df = df[df['Category_1'] == cat].nlargest(10, 'Engagement average')
@@ -53,7 +52,7 @@ for idx, cat in enumerate(categories):
         bar_traces.append(trace)
         fig.add_trace(trace, row=1, col=1)
 
-# Add bar traces for each country
+# Bar chart traces (country-wise)
 for idx, country in enumerate(countries):
     filtered_df = df[df['Audience country'] == country].nlargest(10, 'Engagement average')
     if not filtered_df.empty:
@@ -74,7 +73,7 @@ default_bar_index = len(bar_traces)
 bar_traces.append(default_bar_trace)
 fig.add_trace(default_bar_trace, row=1, col=1)
 
-# Add pie traces for each category
+# Pie chart traces (category-wise)
 pie_traces = []
 for idx, cat in enumerate(categories):
     filtered_counts = df[df['Category_1'] == cat]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
@@ -87,7 +86,7 @@ for idx, cat in enumerate(categories):
         pie_traces.append(trace)
         fig.add_trace(trace, row=1, col=2)
 
-# Add pie traces for each country
+# Pie chart traces (country-wise)
 for idx, country in enumerate(countries):
     filtered_counts = df[df['Audience country'] == country]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
     if filtered_counts.sum() > 0:
@@ -108,7 +107,7 @@ default_pie_index = len(pie_traces)
 pie_traces.append(default_pie_trace)
 fig.add_trace(default_pie_trace, row=1, col=2)
 
-# Create dropdown menus
+# Dropdowns for category
 category_buttons = [
     dict(label="All Categories", method="update", args=[{
         "visible": [True if i == default_bar_index else False for i in range(len(bar_traces))] +
@@ -125,6 +124,7 @@ for cat in categories:
             dict(label=cat, method="update", args=[{"visible": visible + pie_visible}])
         )
 
+# Dropdowns for countries
 country_buttons = [
     dict(label="All Countries", method="update", args=[{
         "visible": [True if i == default_bar_index else False for i in range(len(bar_traces))] +
@@ -141,7 +141,7 @@ for country in countries:
             dict(label=country, method="update", args=[{"visible": visible + pie_visible}])
         )
 
-# Update layout
+# Layout and styling
 fig.update_layout(
     title_text="Instagram Influencer Analytics Dashboard",
     title_x=0.5,
@@ -161,10 +161,9 @@ fig.update_layout(
     margin=dict(t=150)
 )
 
-# Update axes
+# Axes labels
 fig.update_xaxes(title_text="Engagement (Millions)", row=1, col=1, tickformat=".2s")
 fig.update_yaxes(title_text="Influencer", row=1, col=1)
 
-# Save and show
-fig.write_html('influencer_dashboard.html')
-fig.show()
+# Show chart in Streamlit
+st.plotly_chart(fig, use_container_width=True)
