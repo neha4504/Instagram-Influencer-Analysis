@@ -20,18 +20,13 @@ st.title(" Instagram Influencer Dashboard")
 # Sidebar filters
 st.sidebar.header("Filter Influencers")
 
-min_followers = int(df["Followers"].min())
-max_followers = int(df["Followers"].max())
-follower_range = st.sidebar.slider("Filter by Followers", min_followers, max_followers, (min_followers, max_followers))
+min_followers = int(df["Subscribers"].min())
+max_followers = int(df["Subscribers"].max())
 
-selected_category = st.sidebar.multiselect("Filter by Category", options=df["Category_1"].unique(), default=df["Category_1"].unique())
+followers_range = st.sidebar.slider("Select Follower Range:", min_followers, max_followers, (min_followers, max_followers))
 
-# Filtered dataframe
-filtered_df = df[
-    (df["Followers"] >= follower_range[0]) &
-    (df["Followers"] <= follower_range[1]) &
-    (df["Category_1"].isin(selected_category))
-]
+filtered_df = df[(df["Subscribers"] >= followers_range[0]) & (df["Subscribers"] <= followers_range[1])]
+
 
 # KPI section
 st.subheader("Key Metrics")
@@ -67,5 +62,6 @@ st.plotly_chart(fig2, use_container_width=True)
 # Show filtered data
 st.subheader("Filtered Influencer Data")
 st.dataframe(filtered_df)
+
 
 
