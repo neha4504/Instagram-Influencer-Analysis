@@ -26,3 +26,5 @@ The notebook includes a **Plotly-based interactive dashboard** (see notebook cel
 
 **Run the notebook in Jupyter or Colab to interact with the dashboard.**
 
+**LIVE DEMO:**
+[Click here to view the dashboard](https://instagram-influencer-analysis.streamlit.app/)
