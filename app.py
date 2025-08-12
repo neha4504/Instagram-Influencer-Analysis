@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(page_title="Instagram Influencer Dashboard", layout="wide")
 
 # Load dataset
-df = pd.read_csv("your_file.csv")  # Replace with your actual CSV file name
+df = pd.read_csv("social media influencers - instagram sep-2022.csv")  # Replace with your actual CSV file name
 
 # Clean column names
 df.columns = df.columns.str.strip()
@@ -15,10 +15,10 @@ df.columns = df.columns.str.strip()
 df.rename(columns={"Subscribers": "Followers"}, inplace=True)
 
 # Title
-st.title("📊 Instagram Influencer Dashboard")
+st.title(" Instagram Influencer Dashboard")
 
 # Sidebar filters
-st.sidebar.header("🔎 Filter Influencers")
+st.sidebar.header("Filter Influencers")
 
 min_followers = int(df["Followers"].min())
 max_followers = int(df["Followers"].max())
@@ -34,7 +34,7 @@ filtered_df = df[
 ]
 
 # KPI section
-st.subheader("📈 Key Metrics")
+st.subheader("Key Metrics")
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Influencers", len(filtered_df))
@@ -42,7 +42,7 @@ col2.metric("Average Engagement", f"{filtered_df['Engagement average'].mean():.2
 col3.metric("Avg Authentic Engagement", f"{filtered_df['Authentic engagement'].mean():.2f}")
 
 # Charts
-st.subheader("📍 Engagement vs Followers")
+st.subheader(" Engagement vs Followers")
 
 fig1 = px.scatter(
     filtered_df,
@@ -54,7 +54,7 @@ fig1 = px.scatter(
 )
 st.plotly_chart(fig1, use_container_width=True)
 
-st.subheader("📌 Audience Country Distribution")
+st.subheader("Audience Country Distribution")
 
 fig2 = px.histogram(
     filtered_df,
@@ -65,6 +65,7 @@ fig2 = px.histogram(
 st.plotly_chart(fig2, use_container_width=True)
 
 # Show filtered data
-st.subheader("🧾 Filtered Influencer Data")
+st.subheader("Filtered Influencer Data")
 st.dataframe(filtered_df)
+
 
