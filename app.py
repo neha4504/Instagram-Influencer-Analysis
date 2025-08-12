@@ -3,7 +3,7 @@ from plotly.subplots import make_subplots
 import pandas as pd
 
 # Load dataset
-df = pd.read_csv("social media influencers - instagram sep-2022.csv")  # Ensure this file is in the same directory
+df = pd.read_csv("transformed_instagram_influencers.csv")  # Ensure this file is in the same directory
 
 # Prepare top 7 categories
 top_7_categories = df['Category_1'].value_counts().nlargest(7).reset_index()
@@ -153,3 +153,4 @@ fig.update_yaxes(title_text="Influencer", row=1, col=1)
 # Save to HTML and show
 fig.write_html('influencer_dashboard.html')
 fig.show()
+
