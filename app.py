@@ -1,7 +1,21 @@
+# app.py
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
 import streamlit as st
+
+st.set_page_config(layout="wide", page_title="Instagram Influencer Dashboard")
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #121212;
+        color: #f0f0f0;
+    }
+    .css-1v0mbdj, .st-bj, .st-dk, .st-dn {
+        background-color: #1e1e1e;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 try:
     df = pd.read_csv("Processed-dataset/transformed_instagram_influencers.csv")
@@ -35,7 +49,8 @@ for idx, cat in enumerate(categories):
     filtered_df = df[df['Category_1'] == cat].nlargest(10, 'Engagement average')
     if not filtered_df.empty:
         bar = px.bar(filtered_df, x='Engagement average', y='Instagram name', color='Category_1',
-                     text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'})
+                     text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'},
+                     color_discrete_sequence=px.colors.sequential.Plasma_r)
         trace = bar.data[0]
         trace.visible = False
         category_bar_indices[cat] = len(bar_traces)
@@ -47,7 +62,8 @@ for idx, country in enumerate(countries):
     filtered_df = df[df['Audience country'] == country].nlargest(10, 'Engagement average')
     if not filtered_df.empty:
         bar = px.bar(filtered_df, x='Engagement average', y='Instagram name', color='Category_1',
-                     text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'})
+                     text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'},
+                     color_discrete_sequence=px.colors.sequential.Plasma_r)
         trace = bar.data[0]
         trace.visible = False
         country_bar_indices[country] = len(bar_traces)
@@ -56,7 +72,8 @@ for idx, country in enumerate(countries):
 
 # Default bar trace
 default_bar = px.bar(df.nlargest(10, 'Engagement average'), x='Engagement average', y='Instagram name',
-                     color='Category_1', text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'})
+                     color='Category_1', text_auto='.2s', labels={'Engagement average': 'Engagement (Millions)'},
+                     color_discrete_sequence=px.colors.sequential.Plasma_r)
 default_bar_trace = default_bar.data[0]
 default_bar_trace.visible = True
 default_bar_index = len(bar_traces)
@@ -69,7 +86,7 @@ for idx, cat in enumerate(categories):
     filtered_counts = df[df['Category_1'] == cat]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
     if filtered_counts.sum() > 0:
         pie = px.pie(names=top_7_categories['Category'], values=filtered_counts,
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+                     color_discrete_sequence=px.colors.sequential.Magma_r)
         trace = pie.data[0]
         trace.visible = False
         category_pie_indices[cat] = len(pie_traces)
@@ -81,7 +98,7 @@ for idx, country in enumerate(countries):
     filtered_counts = df[df['Audience country'] == country]['Category_1'].value_counts().reindex(top_7_categories['Category']).fillna(0)
     if filtered_counts.sum() > 0:
         pie = px.pie(names=top_7_categories['Category'], values=filtered_counts,
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+                     color_discrete_sequence=px.colors.sequential.Magma_r)
         trace = pie.data[0]
         trace.visible = False
         country_pie_indices[country] = len(pie_traces)
@@ -90,7 +107,7 @@ for idx, country in enumerate(countries):
 
 # Default pie trace
 default_pie = px.pie(top_7_categories, values='Count', names='Category',
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+                     color_discrete_sequence=px.colors.sequential.Magma_r)
 default_pie_trace = default_pie.data[0]
 default_pie_trace.visible = True
 default_pie_index = len(pie_traces)
@@ -135,18 +152,20 @@ fig.update_layout(
     title_text="Instagram Influencer Analytics Dashboard",
     title_x=0.5,
     showlegend=True,
-    height=600,
-    width=1200,
-    template='plotly_white',
+    height=650,
+    width=1400,
+    template='plotly_dark',
+    paper_bgcolor='#121212',
+    plot_bgcolor='#121212',
     updatemenus=[
         dict(buttons=category_buttons,
              direction="down", showactive=True, x=0.1, y=1.2, xanchor="left", yanchor="top",
-             font=dict(size=12), bgcolor='rgba(255,255,255,0.8)'),
+             font=dict(size=12), bgcolor='rgba(30,30,30,0.8)', bordercolor='gray'),
         dict(buttons=country_buttons,
              direction="down", showactive=True, x=0.5, y=1.2, xanchor="left", yanchor="top",
-             font=dict(size=12), bgcolor='rgba(255,255,255,0.8)')
+             font=dict(size=12), bgcolor='rgba(30,30,30,0.8)', bordercolor='gray')
     ],
-    font=dict(family="Arial", size=12),
+    font=dict(family="Arial", size=12, color="#f0f0f0"),
     margin=dict(t=150)
 )
 
