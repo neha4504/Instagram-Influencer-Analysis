@@ -13,9 +13,15 @@ df = pd.read_csv("social media influencers - instagram sep-2022.csv")
 df.columns = df.columns.str.strip()
 
 # Convert 'Engagement average' to numeric
-df['Engagement average'] = df['Engagement average'].astype(str).str.replace(',', '').astype(float)
+df['Engagement average'] = (
+    df['Engagement average']
+    .astype(str)
+    .str.replace(',', '', regex=False)
+    .str.extract('(\d+\.?\d*)')[0]
+    .astype(float)
+)
+df = df.dropna(subset=['Engagement average'])  # Optional: remove rows with bad data
 
-# Title
 st.title("📊 Instagram Influencer Analytics Dashboard")
 
 # Optional preview
@@ -167,3 +173,4 @@ fig.update_yaxes(title_text="Influencer", row=1, col=1)
 
 # Show chart in Streamlit
 st.plotly_chart(fig, use_container_width=True)
+
